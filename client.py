@@ -12,8 +12,8 @@ import win32clipboard as wc
 import requests
 import win32con
 
-USER_NAME = "xx"
-USER_KEY = "xxx"
+USER_NAME = "xxx"
+USER_KEY = "12345678"
 
 
 def upload(code):
@@ -28,7 +28,7 @@ def upload(code):
         'code': code
     }
     print(data)
-    response = requests.post(url="xxxx:8888/upload", data=data)
+    response = requests.post(url="xxxx/upload", data=data)
     print(response)
 
 
@@ -45,17 +45,20 @@ def get_code():
 
 def main():
     """
-    检测按键状态 当同时按下 ctrl + als + O 时执行同步
+    检测按键状态 当同时按下 ctrl + als + numpad0时执行同步
     首先将拷贝代码到剪切板
     :return:
     """
+    last_press_time = time.time()
     while 1:
-        time.sleep(.500)
         if win32api.GetAsyncKeyState(0x11) and \
                 win32api.GetAsyncKeyState(0x12) and \
                 win32api.GetAsyncKeyState(0x4F):
-            code = get_code()
-            upload(code)
+            if time.time() - last_press_time >= 5:
+                code = get_code()
+                upload(code)
+                last_press_time = time.time()
+        time.sleep(.300)
 
 
 if __name__ == '__main__':
